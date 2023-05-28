@@ -2,8 +2,10 @@ import { PhotoIcon } from "@heroicons/react/24/solid";
 import { useFormik } from "formik";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import { createUserWithEmailAndPassword, auth } from "../firebase";
+import {
+  CustomYesNoAlert,
+  CustomResponseAlert,
+} from "../components/CustomAlert";
 import {
   collection,
   db,
@@ -14,6 +16,7 @@ import {
   storage,
   uploadBytesResumable,
 } from "../firebase";
+import md5 from "md5";
 import useAuth from "../hooks/useAuth";
 
 const AddUser = () => {
@@ -33,43 +36,52 @@ const AddUser = () => {
       email: "",
       image: "",
     },
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values) => {
       const newUser = doc(collection(db, "users"));
       const storageRef = ref(storage, `users/${values.name}`);
-
-      await uploadBytesResumable(storageRef, image as Blob);
       const imageUrl = await getDownloadURL(storageRef);
 
-      toast.promise(
-        createUserWithEmailAndPassword(
-          auth,
-          values.email,
-          values.password
-        ).then((userCredential) => {
-          setDoc(
-            newUser,
-            {
-              ...values,
-              username: (
-                formik.values.name.substring(0, 3) +
-                formik.values.lastName.substring(0, 3)
-              ).toLowerCase(),
-              image: imageUrl,
-              restaurantId: uid,
-              uid: userCredential.user.uid,
-            },
-            { merge: true }
+      if (imagePreview !== "") {
+        await uploadBytesResumable(storageRef, image as Blob);
+      }
+
+      CustomYesNoAlert(
+        "¿Estás seguro?",
+        "Una vez eliminado, no podrás recuperar este usuario",
+        "warning"
+      ).then((result) => {
+        if (result.isDismissed) {
+          CustomResponseAlert(
+            "¡Cancelado!",
+            "El usuario no ha sido guardado",
+            "error"
           );
-        }),
-
-        {
-          pending: "Almacenando usuario... 🍳",
-          success: "Usuario almacenado 👌",
-          error: "Error al almacenar usuario 🤯",
+          return;
         }
-      );
-
-      resetForm();
+        setDoc(
+          newUser,
+          {
+            ...values,
+            active: true,
+            username: (
+              formik.values.name.substring(0, 3) +
+              formik.values.lastName.substring(0, 3)
+            ).toLowerCase(),
+            image: imagePreview !== "" ? imageUrl : "",
+            restaurantId: uid,
+            password: md5(values.password),
+          },
+          { merge: true }
+        ).then(() => {
+          CustomResponseAlert(
+            "¡Guardado!",
+            "El usuario ha sido guardado correctamente",
+            "success"
+          ).then(() => {
+            navigate("/users");
+          });
+        });
+      });
     },
   });
 
@@ -216,6 +228,7 @@ const AddUser = () => {
                         value={role}
                         onChange={formik.handleChange}
                         className="mr-2"
+                        required
                       />
                       <span className="inline-flex rounded-md shadow-sm ">
                         {role}
@@ -316,7 +329,6 @@ const AddUser = () => {
           Guardar
         </button>
       </div>
-      <ToastContainer />
     </form>
   );
 };

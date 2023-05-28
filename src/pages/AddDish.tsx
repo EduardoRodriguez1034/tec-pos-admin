@@ -28,19 +28,34 @@ const AddDish = () => {
       name: "",
       price: "",
       description: "",
-      ingredients: [],
+      ingredientsSelected: {} as { [key: string]: boolean },
+      ingridientsQuantity: {} as { [key: string]: string },
     },
+
     onSubmit: async (values, { resetForm }) => {
+      const selectedIngredients = Object.entries(values.ingredientsSelected)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .filter(([_, selected]) => selected)
+        .map(([id]) => ({
+          id,
+          quantity: values.ingridientsQuantity[id] || "",
+        }));
+
       const newDish = doc(collection(db, "dishes"));
       const storageRef = ref(storage, `dishes/${values.name}`);
-
       await uploadBytesResumable(storageRef, image as Blob);
       const imageUrl = await getDownloadURL(storageRef);
-
       toast.promise(
         setDoc(
           newDish,
-          { ...values, image: imageUrl, restaurantId: restaurantUid },
+          {
+            name: values.name,
+            description: values.description,
+            price: values.price,
+            ingredients: selectedIngredients,
+            image: imageUrl,
+            restaurantId: restaurantUid,
+          },
           { merge: true }
         ),
         {
@@ -86,7 +101,7 @@ const AddDish = () => {
                   required
                   onChange={formik.handleChange}
                   value={formik.values.name}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full px-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
@@ -107,7 +122,7 @@ const AddDish = () => {
                   required
                   onChange={formik.handleChange}
                   value={formik.values.price}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block px-3 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
@@ -128,7 +143,7 @@ const AddDish = () => {
                   required
                   onChange={formik.handleChange}
                   value={formik.values.description}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block px-3 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
@@ -143,17 +158,39 @@ const AddDish = () => {
 
               <div className="mt-2 flex flex-col md:flex-row">
                 {ingredients.map((ingredient) => (
-                  <div className="mr-2" key={ingredient.id}>
-                    <span className="inline-flex rounded-md shadow-sm mr-2">
+                  <div
+                    className="mr-2 flex flex-row gap-2 mt-2"
+                    key={ingredient.id}
+                  >
+                    <input
+                      id="ingredientsSelected"
+                      name={`ingredientsSelected.${ingredient.id}`}
+                      type="checkbox"
+                      autoComplete="ingredientsSelected-name"
+                      checked={
+                        formik.values.ingredientsSelected[ingredient.id] ||
+                        false
+                      }
+                      onChange={formik.handleChange}
+                    />
+
+                    <span className="inline-flex items-center text-center mr-2">
                       {ingredient.name}
                     </span>
                     <input
-                      id="ingredients"
-                      name="ingredients"
-                      type="checkbox"
-                      autoComplete="ingredients-name"
-                      value={ingredient.id}
+                      type="number"
+                      name={`ingridientsQuantity.${ingredient.id}`}
+                      id={`ingridientsQuantity-${ingredient.id}`}
+                      autoComplete="ingridientsQuantity"
+                      disabled={
+                        !formik.values.ingredientsSelected[ingredient.id]
+                      }
                       onChange={formik.handleChange}
+                      value={
+                        formik.values.ingridientsQuantity[ingredient.id] || ""
+                      }
+                      placeholder="Cantidad"
+                      className="block w-full px-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
                   </div>
                 ))}
@@ -194,7 +231,6 @@ const AddDish = () => {
                 />
               ) : (
                 <img
-                  // base64
                   src={`${imagePreview}`}
                   alt="avatar"
                   className="mx-auto h-36 w-36 text-gray-300"

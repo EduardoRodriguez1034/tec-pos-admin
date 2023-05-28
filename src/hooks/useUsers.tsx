@@ -17,6 +17,14 @@ const useUsers = () => {
     setUsers(data as User[]);
   };
 
+  const handleEditUser = (id: string) => {
+    console.log(id);
+  };
+
+  const handleDeleteUser = (id: string) => {
+    console.log(id);
+  };
+
   useEffect(() => {
     fetchUsers(restaurantUid as string);
   }, []);
@@ -24,6 +32,8 @@ const useUsers = () => {
   return {
     users,
     restaurantUid,
+    handleEditUser,
+    handleDeleteUser,
   };
 };
 

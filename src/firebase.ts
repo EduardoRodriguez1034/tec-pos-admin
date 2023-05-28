@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getStorage, ref,uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore,  collection, addDoc, doc,setDoc,getDocs,query,where } from "firebase/firestore";
+import { getFirestore,  collection, addDoc, doc,setDoc,getDocs,query,where,deleteDoc } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword,signInWithEmailAndPassword } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -41,5 +41,6 @@ export {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     query,
-    where
+    where,
+    deleteDoc
 }

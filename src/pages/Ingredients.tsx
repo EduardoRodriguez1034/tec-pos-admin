@@ -5,6 +5,10 @@ const Ingredients = () => {
   const { ingredients } = useIngredients();
   const navigate = useNavigate();
 
+  const handleDelete = (id: string) => {
+    console.log(id);
+  };
+
   return (
     <div className="flex flex-col">
       <button
@@ -28,10 +32,6 @@ const Ingredients = () => {
                   <th scope="col" className="px-6 py-4">
                     Unidad
                   </th>
-
-                  <th scope="col" className="px-6 py-4">
-                    Precio Unitario
-                  </th>
                   <th scope="col" className="px-6 py-4">
                     Precio Total
                   </th>
@@ -42,7 +42,10 @@ const Ingredients = () => {
               </thead>
               <tbody>
                 {ingredients.map((ingredient) => (
-                  <tr className="border-b dark:border-neutral-500">
+                  <tr
+                    className="border-b dark:border-neutral-500"
+                    key={ingredient.id}
+                  >
                     <td className="whitespace-nowrap px-6 py-4 font-medium">
                       {ingredient.name}
                     </td>
@@ -51,9 +54,6 @@ const Ingredients = () => {
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
                       {ingredient.unit}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4">
-                      {ingredient.unitPrice}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
                       {ingredient.totalPrice}
