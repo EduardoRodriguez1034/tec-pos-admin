@@ -18,6 +18,13 @@ import {
 } from "../firebase";
 import md5 from "md5";
 import useAuth from "../hooks/useAuth";
+import Webcam from "react-webcam";
+
+const videoConstraints = {
+  width: 1280,
+  height: 720,
+  facingMode: "user",
+};
 
 const AddUser = () => {
   const navigate = useNavigate();
@@ -25,6 +32,7 @@ const AddUser = () => {
 
   const [image, setImage] = useState(new Blob());
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [activateWebcam, setActivateWebcam] = useState<boolean>(false);
 
   const formik = useFormik({
     initialValues: {
@@ -247,6 +255,77 @@ const AddUser = () => {
           >
             Imagen del usuario
           </label>
+          {!activateWebcam && (
+            <button
+              type="button"
+              className="mt-2 inline-flex items-center px-4
+              py-2
+              border border-transparent
+              text-sm
+              font-medium
+              rounded-md
+              shadow-sm
+              text-white
+              bg-indigo-600
+              hover:bg-indigo-700
+              focus:outline-none
+              focus:ring-2
+              focus:ring-offset-2
+              focus:ring-indigo-500"
+              onClick={() => {
+                setActivateWebcam(!activateWebcam);
+              }}
+            >
+              Capturar imagen con camara
+            </button>
+          )}
+          {activateWebcam && (
+            <Webcam
+              audio={false}
+              height={720}
+              screenshotFormat="image/jpeg"
+              width={1280}
+              videoConstraints={videoConstraints}
+              mirrored={true}
+            >
+              {({ getScreenshot }) => (
+                <>
+                  <button
+                    type="button"
+                    className="mt-2 inline-flex items-center px-4
+              py-2
+              border border-transparent
+              text-sm
+              font-medium
+              rounded-md
+              shadow-sm
+              text-white
+              bg-indigo-600
+              hover:bg-indigo-700
+              focus:outline-none
+              focus:ring-2
+              focus:ring-offset-2
+              focus:ring-indigo-500"
+                    onClick={() => {
+                      const imageSrc = getScreenshot();
+                      setImagePreview(imageSrc as string);
+                      setImage(imageSrc as unknown as Blob);
+                    }}
+                  >
+                    Tomar foto
+                  </button>
+                  <button
+                    type="button"
+                    className="text-sm font-semibold leading-6 text-gray-900 ml-2"
+                    onClick={() => setActivateWebcam(!activateWebcam)}
+                  >
+                    Cancelar
+                  </button>
+                </>
+              )}
+            </Webcam>
+          )}
+
           <div
             className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
             onDragOver={(e) => {
