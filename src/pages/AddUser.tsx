@@ -47,7 +47,7 @@ const AddUser = () => {
 
       CustomYesNoAlert(
         "¿Estás seguro?",
-        "Una vez eliminado, no podrás recuperar este usuario",
+        "Se guardará el usuario en la base de datos",
         "warning"
       ).then((result) => {
         if (result.isDismissed) {

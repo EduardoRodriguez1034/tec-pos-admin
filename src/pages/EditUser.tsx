@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import useAuth from "../hooks/useAuth";
+import {
+  CustomYesNoAlert,
+  CustomResponseAlert,
+} from "../components/CustomAlert";
 import {
   db,
   doc,
@@ -17,7 +19,6 @@ import { PhotoIcon } from "@heroicons/react/24/outline";
 const EditUser = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { uid } = useAuth();
 
   const [image, setImage] = useState(new Blob());
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -38,30 +39,40 @@ const EditUser = () => {
       await uploadBytesResumable(storageRef, image as Blob);
       const imageUrl = await getDownloadURL(storageRef);
 
-      toast
-        .promise(
-          setDoc(
-            newUser,
-            {
-              ...values,
-              username: (
-                formik.values.name.substring(0, 3) +
-                formik.values.lastName.substring(0, 3)
-              ).toLowerCase(),
-              image: imageUrl,
-              restaurantId: uid,
-            },
-            { merge: true }
-          ),
+      CustomYesNoAlert(
+        "¿Estás seguro?",
+        "Se editará el usuario en la base de datos",
+        "warning"
+      ).then((result) => {
+        if (result.isDismissed) {
+          CustomResponseAlert(
+            "¡Cancelado!",
+            "El usuario no ha sido editado",
+            "error"
+          );
+          return;
+        }
+        setDoc(
+          newUser,
           {
-            pending: "Almacenando usuario... 🍳",
-            success: "Usuario almacenado 👌",
-            error: "Error al almacenar usuario 🤯",
-          }
-        )
-        .then(() => {
-          navigate("/users");
+            ...values,
+            username: (
+              formik.values.name.substring(0, 3) +
+              formik.values.lastName.substring(0, 3)
+            ).toLowerCase(),
+            image: imageUrl,
+          },
+          { merge: true }
+        ).then(() => {
+          CustomResponseAlert(
+            "¡Guardado!",
+            "El usuario ha sido editado correctamente",
+            "success"
+          ).then(() => {
+            navigate("/users");
+          });
         });
+      });
     },
   });
 
@@ -289,7 +300,6 @@ const EditUser = () => {
           Guardar
         </button>
       </div>
-      <ToastContainer />
     </form>
   );
 };

@@ -3,6 +3,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
+import {
+  CustomYesNoAlert,
+  CustomResponseAlert,
+} from "../components/CustomAlert";
 
 const AddIngredient = () => {
   const restaurantUid = localStorage.getItem("uid");
@@ -15,22 +19,37 @@ const AddIngredient = () => {
       stock: "",
       unit: "Gramos",
     },
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values) => {
       const newIngredient = doc(collection(db, "ingredients"));
 
-      toast.promise(
+      CustomYesNoAlert(
+        "¿Estás seguro?",
+        "Se guardará el ingrediente en la base de datos",
+
+        "warning"
+      ).then((result) => {
+        if (result.isDismissed) {
+          CustomResponseAlert(
+            "¡Cancelado!",
+            "El ingrediente no ha sido guardado",
+            "error"
+          );
+          return;
+        }
         setDoc(
           newIngredient,
           { ...values, restaurantId: restaurantUid },
           { merge: true }
-        ),
-        {
-          pending: "Agregando ingrediente... 🍳",
-          success: "Ingrediente agregado 👌",
-          error: "Error al agregar ingrediente 🤯",
-        }
-      );
-      resetForm();
+        ).then(() => {
+          CustomResponseAlert(
+            "¡Guardado!",
+            "El ingrediente ha sido guardado correctamente",
+            "success"
+          ).then(() => {
+            navigate("/ingredients");
+          });
+        });
+      });
     },
   });
 
