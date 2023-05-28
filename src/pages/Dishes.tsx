@@ -1,17 +1,46 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
 import useDishes from "../hooks/useDishes";
+import { db, doc, setDoc } from "../firebase";
+import {
+  CustomYesNoAlert,
+  CustomResponseAlert,
+} from "../components/CustomAlert";
+import { Dish } from "../models/dishes.model";
 
 const Dishes = () => {
-  const { dishes, fetchDishes } = useDishes();
-  const { uid } = useAuth();
+  const { dishes } = useDishes();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchDishes(uid as string);
-  }, []);
+  const handleDelete = async (dbDish: Dish) => {
+    const ingredient = doc(db, "dishes", dbDish.id);
 
+    CustomYesNoAlert(
+      "¿Estás seguro?",
+      "Una vez eliminado, no podrás recuperar este platillo",
+      "warning"
+    ).then((result) => {
+      if (result.isConfirmed) {
+        setDoc(
+          ingredient,
+          {
+            ...dbDish,
+            deleted: true,
+          },
+          { merge: true }
+        )
+          .then(() => {
+            CustomResponseAlert(
+              "¡Eliminado!",
+              "El platillo ha sido eliminado correctamente",
+              "success"
+            );
+          })
+          .then(() => {
+            navigate("/dishes");
+          });
+      }
+    });
+  };
   return (
     <div className="flex flex-col">
       <button
@@ -55,10 +84,18 @@ const Dishes = () => {
                     </td>
 
                     <td className="whitespace-nowrap px-6 py-4">
-                      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+                      <button
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+                        onClick={() =>
+                          navigate("/edit/dishes", { state: dish })
+                        }
+                      >
                         Editar
                       </button>
-                      <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                      <button
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={() => handleDelete(dish)}
+                      >
                         Eliminar
                       </button>
                     </td>

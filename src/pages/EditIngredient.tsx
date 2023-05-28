@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { db, doc, setDoc } from "../firebase";
-import "react-toastify/dist/ReactToastify.css";
 import { useFormik } from "formik";
 import {
   CustomYesNoAlert,

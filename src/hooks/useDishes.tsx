@@ -4,6 +4,7 @@ import { Dish } from "../models/dishes.model";
 
 const useDishes = () => {
   const [dishes, setDishes] = useState<Dish[]>([]);
+  const restaurantUid = localStorage.getItem("uid");
 
   const fetchDishes = async (restaurantId: string) => {
     const dishesRef = collection(db, "dishes");
@@ -16,6 +17,10 @@ const useDishes = () => {
     }));
     setDishes(data as Dish[]);
   };
+
+  useEffect(() => {
+    fetchDishes(restaurantUid as string);
+  }, []);
 
   return {
     dishes,

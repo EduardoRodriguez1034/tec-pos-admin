@@ -1,5 +1,4 @@
 import { db, collection, doc, setDoc } from "../firebase";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
@@ -174,7 +173,6 @@ const AddIngredient = () => {
           Guardar
         </button>
       </div>
-      <ToastContainer />
     </form>
   );
 };

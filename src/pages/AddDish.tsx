@@ -2,8 +2,10 @@ import { PhotoIcon } from "@heroicons/react/24/solid";
 import { useFormik } from "formik";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-
+import {
+  CustomYesNoAlert,
+  CustomResponseAlert,
+} from "../components/CustomAlert";
 import {
   collection,
   db,
@@ -32,7 +34,7 @@ const AddDish = () => {
       ingridientsQuantity: {} as { [key: string]: string },
     },
 
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values) => {
       const selectedIngredients = Object.entries(values.ingredientsSelected)
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .filter(([_, selected]) => selected)
@@ -45,7 +47,21 @@ const AddDish = () => {
       const storageRef = ref(storage, `dishes/${values.name}`);
       await uploadBytesResumable(storageRef, image as Blob);
       const imageUrl = await getDownloadURL(storageRef);
-      toast.promise(
+
+      CustomYesNoAlert(
+        "¿Estás seguro?",
+        "Se guardará el platillo en la base de datos",
+
+        "warning"
+      ).then((result) => {
+        if (result.isDismissed) {
+          CustomResponseAlert(
+            "¡Cancelado!",
+            "El platillo no ha sido guardado",
+            "error"
+          );
+          return;
+        }
         setDoc(
           newDish,
           {
@@ -55,17 +71,19 @@ const AddDish = () => {
             ingredients: selectedIngredients,
             image: imageUrl,
             restaurantId: restaurantUid,
+            active: true,
           },
           { merge: true }
-        ),
-        {
-          pending: "Agregando Platillo... 🍳",
-          success: "Platillo agregado 👌",
-          error: "Error al agregar Platillo 🤯",
-        }
-      );
-      resetForm();
-      navigate("/dishes");
+        ).then(() => {
+          CustomResponseAlert(
+            "¡Guardado!",
+            "El platillo ha sido guardado correctamente",
+            "success"
+          ).then(() => {
+            navigate("/dishes");
+          });
+        });
+      });
     },
   });
 
@@ -243,6 +261,7 @@ const AddDish = () => {
                 >
                   <span>Subir archivo</span>
                   <input
+                    required
                     id="image"
                     name="image"
                     type="file"
@@ -286,7 +305,6 @@ const AddDish = () => {
           Save
         </button>
       </div>
-      <ToastContainer />
     </form>
   );
 };

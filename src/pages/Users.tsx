@@ -24,7 +24,7 @@ const Users = () => {
           user,
           {
             ...dbUser,
-            active: false,
+            deleted: true,
           },
           { merge: true }
         )
