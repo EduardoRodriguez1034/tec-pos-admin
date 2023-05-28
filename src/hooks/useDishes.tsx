@@ -20,6 +20,7 @@ const useDishes = () => {
 
   useEffect(() => {
     fetchDishes(restaurantUid as string);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

@@ -8,7 +8,6 @@ import {
   CustomResponseAlert,
 } from "../components/CustomAlert";
 import {
-  collection,
   db,
   doc,
   getDownloadURL,
