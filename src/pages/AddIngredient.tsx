@@ -1,5 +1,4 @@
 import { db, collection, doc, setDoc } from "../firebase";
-import "react-toastify/dist/ReactToastify.css";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import {

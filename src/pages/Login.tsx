@@ -1,8 +1,8 @@
 import { auth, signInWithEmailAndPassword } from "../firebase";
-import { ToastContainer, toast } from "react-toastify";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { CustomResponseAlert } from "../components/CustomAlert";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -11,10 +11,14 @@ const Login = () => {
       email: "",
       password: "",
     },
-    onSubmit: (values, { resetForm }) => {
-      toast.promise(
-        signInWithEmailAndPassword(auth, values.email, values.password).then(
-          (userCredential) => {
+    onSubmit: (values) => {
+      CustomResponseAlert(
+        "¡Iniciando sesión!",
+        "Estamos iniciando sesión, espera un momento",
+        "info"
+      ).then(() => {
+        signInWithEmailAndPassword(auth, values.email, values.password)
+          .then((userCredential) => {
             localStorage.setItem("email", userCredential.user.email as string);
             localStorage.setItem(
               "name",
@@ -22,19 +26,16 @@ const Login = () => {
             );
             localStorage.setItem("uid", userCredential.user.uid);
             navigate("/dashboard");
-          }
-        ),
-        {
-          pending: "Iniciando sesión... 🍳",
-          success: "Sesión autenticada 👌",
-          error: {
-            render: ({ data }: any) => {
-              return data.code;
-            },
-          },
-        }
-      );
-      resetForm();
+          })
+          .catch((error) => {
+            CustomResponseAlert(
+              "¡Error!",
+              "El usuario o la contraseña son incorrectos",
+              "error"
+            );
+            console.log(error);
+          });
+      });
     },
   });
 
@@ -120,7 +121,6 @@ const Login = () => {
           </div>
         </form>
       </div>
-      <ToastContainer />
     </div>
   );
 };

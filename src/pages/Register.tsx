@@ -1,5 +1,4 @@
 import { useFormik } from "formik";
-import { ToastContainer, toast } from "react-toastify";
 import {
   auth,
   createUserWithEmailAndPassword,
@@ -9,6 +8,7 @@ import {
   setDoc,
 } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import { CustomResponseAlert } from "../components/CustomAlert";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -20,47 +20,49 @@ const Register = () => {
       confirmPassword: "",
       fullname: "",
     },
-    onSubmit: (values, { resetForm }) => {
+    onSubmit: (values) => {
       if (values.password !== values.confirmPassword) {
-        toast.error("Las contraseñas no coinciden 🤯");
+        CustomResponseAlert(
+          "error",
+          "Las contraseñas no coinciden",
+          "error"
+        ).then(() => {
+          formik.resetForm();
+        });
+
         return;
       }
-      toast.promise(
-        createUserWithEmailAndPassword(
-          auth,
-          values.email,
-          values.password
-        ).then((userCredential) => {
-          localStorage.setItem("email", userCredential.user.email as string);
-          localStorage.setItem(
-            "name",
-            userCredential.user.displayName as string
-          );
-          localStorage.setItem("uid", userCredential.user.uid);
-          const newUser = doc(collection(db, "restaurants"));
-          setDoc(
-            newUser,
-            {
-              name: values.fullname,
-              email: values.email,
-              uid: userCredential.user.uid,
-            },
-            { merge: true }
-          );
+      CustomResponseAlert("success", "Cuenta creada con exito", "success").then(
+        () => {
+          createUserWithEmailAndPassword(auth, values.email, values.password)
+            .then((userCredential) => {
+              localStorage.setItem(
+                "email",
+                userCredential.user.email as string
+              );
+              localStorage.setItem(
+                "name",
+                userCredential.user.displayName as string
+              );
+              localStorage.setItem("uid", userCredential.user.uid);
+              const newUser = doc(collection(db, "restaurants"));
+              setDoc(
+                newUser,
+                {
+                  name: values.fullname,
+                  email: values.email,
+                  uid: userCredential.user.uid,
+                },
+                { merge: true }
+              );
 
-          navigate("/dashboard");
-        }),
-        {
-          pending: "Creando cuenta... 🍳",
-          success: "Cuenta creada 👌",
-          error: {
-            render: ({ data }: any) => {
-              return data.code;
-            },
-          },
+              navigate("/dashboard");
+            })
+            .catch((error) => {
+              CustomResponseAlert("error", error.message, "error");
+            });
         }
       );
-      resetForm();
     },
   });
 
@@ -146,7 +148,6 @@ const Register = () => {
           .
         </div>
       </form>
-      <ToastContainer />
     </div>
   );
 };
