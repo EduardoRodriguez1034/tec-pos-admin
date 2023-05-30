@@ -10,6 +10,11 @@ import Dishes from "../pages/Dishes";
 import Ingredients from "../pages/Ingredients";
 import Login from "../pages/Login";
 import Users from "../pages/Users";
+import CardProgress from "../components/CardProgress";
+import Tarjeta from "../components/Tarjeta";
+import GrafPastel from "../components/GrafPastel";
+import RangoFecha from "../components/RangoFecha";
+import Tabla from "../components/Tabla";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +35,12 @@ const Navigation = () => {
         <Route path="/add/dishes" element={<AddDish />} />
         <Route path="/add/ingredients" element={<AddIngridient />} />
         <Route path="/add/users" element={<AddUser />} />
-
+        <Route path="Dashboard" element={<Dashboard />} />
+        <Route path="/CardProgress" element={<CardProgress/>} />
+        <Route path="/Tarjeta" element={<Tarjeta/>} />
+        <Route path="/GrafPastel" element={<GrafPastel/>} />
+        <Route path="/RangoFecha" element={<RangoFecha/>} />
+        <Route path="/Tabla" element={<Tabla/>} />
         <Route path="*" element={<h1>Not Found</h1>} />
       </Routes>
     </>

@@ -1,5 +1,5 @@
 import { BrowserRouter } from "react-router-dom";
-import Navigation from "./routes/navigation";
+import Navigation from "./routes/Navigation";
 
 export default function App() {
   return (
