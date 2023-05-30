@@ -1,13 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PhotoIcon } from "@heroicons/react/24/solid";
 import { useFormik } from "formik";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   CustomYesNoAlert,
   CustomResponseAlert,
 } from "../components/CustomAlert";
 import {
-  collection,
   db,
   doc,
   getDownloadURL,
@@ -18,8 +18,10 @@ import {
 } from "../firebase";
 import useIngredients from "../hooks/useIngredients";
 
-const AddDish = () => {
-  const { ingredients, restaurantUid } = useIngredients();
+const EditDish = () => {
+  const { state } = useLocation();
+
+  const { ingredients } = useIngredients();
   const navigate = useNavigate();
 
   const [image, setImage] = useState(new Blob());
@@ -27,11 +29,27 @@ const AddDish = () => {
 
   const formik = useFormik({
     initialValues: {
-      name: "",
-      price: "",
-      description: "",
-      ingredientsSelected: {} as { [key: string]: boolean },
-      ingridientsQuantity: {} as { [key: string]: string },
+      name: state.name,
+      price: state.price,
+      description: state.description,
+      ingredientsSelected: {
+        ...state.ingredients.reduce(
+          (acc: any, ingredient: { id: any }) => ({
+            ...acc,
+            [ingredient.id]: true,
+          }),
+          {}
+        ),
+      } as { [key: string]: boolean },
+      ingridientsQuantity: {
+        ...state.ingredients.reduce(
+          (acc: any, ingredient: { id: any; quantity: any }) => ({
+            ...acc,
+            [ingredient.id]: ingredient.quantity,
+          }),
+          {}
+        ),
+      } as { [key: string]: string },
     },
 
     onSubmit: async (values) => {
@@ -43,21 +61,22 @@ const AddDish = () => {
           quantity: values.ingridientsQuantity[id] || "",
         }));
 
-      const newDish = doc(collection(db, "dishes"));
+      const newDish = doc(db, "dishes", state.id);
+
       const storageRef = ref(storage, `dishes/${values.name}`);
       await uploadBytesResumable(storageRef, image as Blob);
       const imageUrl = await getDownloadURL(storageRef);
 
       CustomYesNoAlert(
         "¿Estás seguro?",
-        "Se guardará el platillo en la base de datos",
+        "Se editará el platillo en la base de datos",
 
         "warning"
       ).then((result) => {
         if (result.isDismissed) {
           CustomResponseAlert(
             "¡Cancelado!",
-            "El platillo no ha sido guardado",
+            "El platillo no ha sido editado",
             "error"
           );
           return;
@@ -70,14 +89,12 @@ const AddDish = () => {
             price: values.price,
             ingredients: selectedIngredients,
             image: imageUrl,
-            restaurantId: restaurantUid,
-            active: true,
           },
           { merge: true }
         ).then(() => {
           CustomResponseAlert(
             "¡Guardado!",
-            "El platillo ha sido guardado correctamente",
+            "El platillo ha sido editado correctamente",
             "success"
           ).then(() => {
             navigate("/dishes");
@@ -309,4 +326,4 @@ const AddDish = () => {
   );
 };
 
-export default AddDish;
+export default EditDish;

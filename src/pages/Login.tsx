@@ -1,26 +1,50 @@
-import React from "react";
-import { auth, setDoc, signInWithEmailAndPassword } from "../firebase";
-import { ToastContainer, toast } from "react-toastify";
+import { auth, signInWithEmailAndPassword } from "../firebase";
 import { useFormik } from "formik";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { CustomResponseAlert } from "../components/CustomAlert";
 
 const Login = () => {
+  const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
     },
-    onSubmit: (values, { resetForm }) => {
-      toast.promise(
-        signInWithEmailAndPassword(auth, values.email, values.password),
-        {
-          pending: "Iniciando sesión... 🍳",
-          success: "Sesión autenticada 👌",
-          error: "Error al iniciar sesión 🤯",
-        }
-      );
-      resetForm();
+    onSubmit: (values) => {
+      CustomResponseAlert(
+        "¡Iniciando sesión!",
+        "Estamos iniciando sesión, espera un momento",
+        "info"
+      ).then(() => {
+        signInWithEmailAndPassword(auth, values.email, values.password)
+          .then((userCredential) => {
+            localStorage.setItem("email", userCredential.user.email as string);
+            localStorage.setItem(
+              "name",
+              userCredential.user.displayName as string
+            );
+            localStorage.setItem("uid", userCredential.user.uid);
+            navigate("/dashboard");
+          })
+          .catch((error) => {
+            CustomResponseAlert(
+              "¡Error!",
+              "El usuario o la contraseña son incorrectos",
+              "error"
+            );
+            console.log(error);
+          });
+      });
     },
   });
+
+  useEffect(() => {
+    const user = localStorage.getItem("email");
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, []);
 
   return (
     <div>
@@ -32,18 +56,15 @@ const Login = () => {
           onReset={formik.handleReset}
         >
           <div className="flex items-center space-x-4">
-            <div className="h-14 w-14 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-              A
-            </div>
             <div className="block pl-2 font-semibold text-xl self-start text-gray-700">
               <h2 className="leading-relaxed">Login</h2>
               <p className="text-sm text-gray-500 font-normal leading-relaxed">
-                Enter your credentials to continue.
+                Inicia sesión para continuar
               </p>
             </div>
           </div>
           <div>
-            <label className="block text-gray-700">Email</label>
+            <label className="block text-gray-700">Correo Electronico</label>
             <input
               type="text"
               name="email"
@@ -59,7 +80,7 @@ const Login = () => {
             ) : null}
           </div>
           <div>
-            <label className="block text-gray-700">Password</label>
+            <label className="block text-gray-700">Contraseña</label>
             <input
               type="password"
               className="w-full px-4 py-2 mt-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
@@ -75,35 +96,31 @@ const Login = () => {
             ) : null}
           </div>
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
-              />
-              <label className="ml-2 block text-sm text-gray-900">
-                Remember me
-              </label>
-            </div>
             <div className="text-sm">
               <a
                 href="#"
                 className="font-medium text-blue-500 hover:text-blue-400"
               >
-                Forgot your password?
+                ¿Olvidaste tu contraseña?
               </a>
             </div>
           </div>
-          <div>
+          <div className="flex justify-center flex-col">
             <button
               type="submit"
               className="w-full px-4 py-2 font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none"
             >
               Login
             </button>
+            <a
+              href="/register"
+              className="  font-medium  text-blue-500 rounded-lg hover:text-blue-400 focus:outline-none text-center mt-2"
+            >
+              ¿No tienes una cuenta? Registrate
+            </a>
           </div>
         </form>
       </div>
-      <ToastContainer />
     </div>
   );
 };

@@ -1,11 +1,25 @@
 import { useNavigate } from "react-router-dom";
+import { auth } from "../firebase";
 
 const DrawerNavigation = ({ handleDrawer }: { handleDrawer: () => void }) => {
   const navigate = useNavigate();
+
   const handleNavigation = (path: string) => {
     navigate(path);
     handleDrawer();
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem("email");
+    localStorage.removeItem("name");
+    localStorage.removeItem("uid");
+    localStorage.removeItem("user");
+
+    auth.signOut().then(() => {
+      navigate("/login");
+    });
+  };
+
   return (
     <div
       id="drawer-navigation"
@@ -46,7 +60,7 @@ const DrawerNavigation = ({ handleDrawer }: { handleDrawer: () => void }) => {
         <ul className="space-y-2 font-medium">
           <li>
             <a
-              onClick={() => handleNavigation("/")}
+              onClick={() => handleNavigation("/dashboard")}
               className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer "
             >
               <svg
@@ -156,8 +170,8 @@ const DrawerNavigation = ({ handleDrawer }: { handleDrawer: () => void }) => {
           </li>
 
           <li>
-            <a
-              href="/"
+            <button
+              onClick={handleLogout}
               className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer "
             >
               <svg
@@ -176,7 +190,7 @@ const DrawerNavigation = ({ handleDrawer }: { handleDrawer: () => void }) => {
               <span className="flex-1 ml-3 whitespace-nowrap">
                 Cerrar Sesion
               </span>
-            </a>
+            </button>
           </li>
         </ul>
       </div>

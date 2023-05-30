@@ -2,8 +2,10 @@ import { PhotoIcon } from "@heroicons/react/24/solid";
 import { useFormik } from "formik";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import { createUserWithEmailAndPassword, auth } from "../firebase";
+import {
+  CustomYesNoAlert,
+  CustomResponseAlert,
+} from "../components/CustomAlert";
 import {
   collection,
   db,
@@ -14,12 +16,23 @@ import {
   storage,
   uploadBytesResumable,
 } from "../firebase";
+import md5 from "md5";
+import useAuth from "../hooks/useAuth";
+import Webcam from "react-webcam";
+
+const videoConstraints = {
+  width: 1280,
+  height: 720,
+  facingMode: "user",
+};
 
 const AddUser = () => {
   const navigate = useNavigate();
+  const { uid } = useAuth();
 
   const [image, setImage] = useState(new Blob());
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [activateWebcam, setActivateWebcam] = useState<boolean>(false);
 
   const formik = useFormik({
     initialValues: {
@@ -31,41 +44,52 @@ const AddUser = () => {
       email: "",
       image: "",
     },
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values) => {
       const newUser = doc(collection(db, "users"));
       const storageRef = ref(storage, `users/${values.name}`);
-
-      await uploadBytesResumable(storageRef, image as Blob);
       const imageUrl = await getDownloadURL(storageRef);
 
-      toast.promise(
+      if (imagePreview !== "") {
+        await uploadBytesResumable(storageRef, image as Blob);
+      }
+
+      CustomYesNoAlert(
+        "¿Estás seguro?",
+        "Se guardará el usuario en la base de datos",
+        "warning"
+      ).then((result) => {
+        if (result.isDismissed) {
+          CustomResponseAlert(
+            "¡Cancelado!",
+            "El usuario no ha sido guardado",
+            "error"
+          );
+          return;
+        }
         setDoc(
           newUser,
           {
             ...values,
+            active: true,
             username: (
               formik.values.name.substring(0, 3) +
               formik.values.lastName.substring(0, 3)
             ).toLowerCase(),
-            image: imageUrl,
+            image: imagePreview !== "" ? imageUrl : "",
+            restaurantId: uid,
+            password: md5(values.password),
           },
           { merge: true }
-        ),
-        {
-          pending: "Almacenando usuario... 🍳",
-          success: "Usuario almacenado 👌",
-          error: "Error al almacenar usuario 🤯",
-        }
-      );
-      toast.promise(
-        createUserWithEmailAndPassword(auth, values.email, values.password),
-        {
-          pending: "Almacenando usuario... 🍳",
-          success: "Usuario almacenado 👌",
-          error: "Error al almacenar usuario 🤯",
-        }
-      );
-      resetForm();
+        ).then(() => {
+          CustomResponseAlert(
+            "¡Guardado!",
+            "El usuario ha sido guardado correctamente",
+            "success"
+          ).then(() => {
+            navigate("/users");
+          });
+        });
+      });
     },
   });
 
@@ -212,6 +236,7 @@ const AddUser = () => {
                         value={role}
                         onChange={formik.handleChange}
                         className="mr-2"
+                        required
                       />
                       <span className="inline-flex rounded-md shadow-sm ">
                         {role}
@@ -230,6 +255,77 @@ const AddUser = () => {
           >
             Imagen del usuario
           </label>
+          {!activateWebcam && (
+            <button
+              type="button"
+              className="mt-2 inline-flex items-center px-4
+              py-2
+              border border-transparent
+              text-sm
+              font-medium
+              rounded-md
+              shadow-sm
+              text-white
+              bg-indigo-600
+              hover:bg-indigo-700
+              focus:outline-none
+              focus:ring-2
+              focus:ring-offset-2
+              focus:ring-indigo-500"
+              onClick={() => {
+                setActivateWebcam(!activateWebcam);
+              }}
+            >
+              Capturar imagen con camara
+            </button>
+          )}
+          {activateWebcam && (
+            <Webcam
+              audio={false}
+              height={720}
+              screenshotFormat="image/jpeg"
+              width={1280}
+              videoConstraints={videoConstraints}
+              mirrored={true}
+            >
+              {({ getScreenshot }) => (
+                <>
+                  <button
+                    type="button"
+                    className="mt-2 inline-flex items-center px-4
+              py-2
+              border border-transparent
+              text-sm
+              font-medium
+              rounded-md
+              shadow-sm
+              text-white
+              bg-indigo-600
+              hover:bg-indigo-700
+              focus:outline-none
+              focus:ring-2
+              focus:ring-offset-2
+              focus:ring-indigo-500"
+                    onClick={() => {
+                      const imageSrc = getScreenshot();
+                      setImagePreview(imageSrc as string);
+                      setImage(imageSrc as unknown as Blob);
+                    }}
+                  >
+                    Tomar foto
+                  </button>
+                  <button
+                    type="button"
+                    className="text-sm font-semibold leading-6 text-gray-900 ml-2"
+                    onClick={() => setActivateWebcam(!activateWebcam)}
+                  >
+                    Cancelar
+                  </button>
+                </>
+              )}
+            </Webcam>
+          )}
+
           <div
             className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
             onDragOver={(e) => {
@@ -312,7 +408,6 @@ const AddUser = () => {
           Guardar
         </button>
       </div>
-      <ToastContainer />
     </form>
   );
 };

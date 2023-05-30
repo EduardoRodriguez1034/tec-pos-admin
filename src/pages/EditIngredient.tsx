@@ -1,47 +1,44 @@
-import { db, collection, doc, setDoc } from "../firebase";
+import { useLocation, useNavigate } from "react-router-dom";
+import { db, doc, setDoc } from "../firebase";
 import { useFormik } from "formik";
-import { useNavigate } from "react-router-dom";
 import {
   CustomYesNoAlert,
   CustomResponseAlert,
 } from "../components/CustomAlert";
 
-const AddIngredient = () => {
-  const restaurantUid = localStorage.getItem("uid");
+const EditIngredient = () => {
+  const { state } = useLocation();
+
   const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
-      name: "",
-      totalPrice: "",
-      stock: "",
-      unit: "Gramos",
+      name: state.name,
+      totalPrice: state.totalPrice,
+      stock: state.stock,
+      unit: state.unit,
     },
     onSubmit: async (values) => {
-      const newIngredient = doc(collection(db, "ingredients"));
+      const newIngredient = doc(db, "ingredient", state.id);
 
       CustomYesNoAlert(
         "¿Estás seguro?",
-        "Se guardará el ingrediente en la base de datos",
+        "Se editara el ingrediente en la base de datos",
 
         "warning"
       ).then((result) => {
         if (result.isDismissed) {
           CustomResponseAlert(
             "¡Cancelado!",
-            "El ingrediente no ha sido guardado",
+            "El ingrediente no ha sido editado",
             "error"
           );
           return;
         }
-        setDoc(
-          newIngredient,
-          { ...values, restaurantId: restaurantUid },
-          { merge: true }
-        ).then(() => {
+        setDoc(newIngredient, { ...values }, { merge: true }).then(() => {
           CustomResponseAlert(
             "¡Guardado!",
-            "El ingrediente ha sido guardado correctamente",
+            "El ingrediente ha sido editado correctamente",
             "success"
           ).then(() => {
             navigate("/ingredients");
@@ -101,9 +98,6 @@ const AddIngredient = () => {
                   value={formik.values.totalPrice}
                   className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
-                {formik.errors.totalPrice ? (
-                  <div>{formik.errors.totalPrice}</div>
-                ) : null}
               </div>
             </div>
 
@@ -176,4 +170,4 @@ const AddIngredient = () => {
   );
 };
 
-export default AddIngredient;
+export default EditIngredient;

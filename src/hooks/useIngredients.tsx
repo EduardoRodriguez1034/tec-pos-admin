@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
-import { collection, db, getDocs } from "../firebase";
+import { collection, db, getDocs, query, where } from "../firebase";
 import { Ingredient } from "../models/ingredients.model";
 
 const useIngredients = () => {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const restaurantUid = localStorage.getItem("uid");
 
-  const fetchIngredients = async () => {
-    const response = await getDocs(collection(db, "ingredients"));
+  const fetchIngredients = async (restaurantId: string) => {
+    const ingredientsRef = collection(db, "ingredients");
+    const q = query(
+      ingredientsRef,
+      where("restaurantId", "==", `${restaurantId}`)
+    );
+
+    const response = await getDocs(q);
     const data = response.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -15,11 +22,12 @@ const useIngredients = () => {
   };
 
   useEffect(() => {
-    fetchIngredients();
+    fetchIngredients(restaurantUid as string);
   }, []);
 
   return {
     ingredients,
+    restaurantUid,
   };
 };
 

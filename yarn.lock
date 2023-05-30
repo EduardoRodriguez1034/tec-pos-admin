@@ -896,6 +896,11 @@
   resolved "https://registry.npmjs.org/@types/long/-/long-4.0.2.tgz"
   integrity sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==
 
+"@types/md5@^2.3.2":
+  version "2.3.2"
+  resolved "https://registry.npmjs.org/@types/md5/-/md5-2.3.2.tgz"
+  integrity sha512-v+JFDu96+UYJ3/UWzB0mEglIS//MZXgRaJ4ubUPwOM0gvLc/kcQ3TWNYwENEK7/EcXGQVrW8h/XqednSjBd/Og==
+
 "@types/node@>= 14", "@types/node@>=12.12.47", "@types/node@>=13.7.0":
   version "18.16.3"
   resolved "https://registry.npmjs.org/@types/node/-/node-18.16.3.tgz"
@@ -1179,6 +1184,11 @@ chalk@^4.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
+charenc@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.npmjs.org/charenc/-/charenc-0.0.2.tgz"
+  integrity sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==
+
 chokidar@^3.5.3:
   version "3.5.3"
   resolved "https://registry.npmjs.org/chokidar/-/chokidar-3.5.3.tgz"
@@ -1270,10 +1280,15 @@ cross-spawn@^7.0.2:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
+
 css-unit-converter@^1.1.1:
   version "1.1.2"
   resolved "https://registry.npmjs.org/css-unit-converter/-/css-unit-converter-1.1.2.tgz"
   integrity sha512-IiJwMC8rdZE0+xiEZHeru6YoONC4rfPMqGm2W85jMIbkFvv5nFTwJVFHam2eFrN6txmoUYFAFXiv8ICVeTO0MA==
+crypt@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.npmjs.org/crypt/-/crypt-0.0.2.tgz"
+  integrity sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==
 
 cssesc@^3.0.0:
   version "3.0.0"
@@ -1896,6 +1911,11 @@ is-binary-path@~2.1.0:
   dependencies:
     binary-extensions "^2.0.0"
 
+is-buffer@~1.1.6:
+  version "1.1.6"
+  resolved "https://registry.npmjs.org/is-buffer/-/is-buffer-1.1.6.tgz"
+  integrity sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==
+
 is-core-module@^2.11.0:
   version "2.12.0"
   resolved "https://registry.npmjs.org/is-core-module/-/is-core-module-2.12.0.tgz"
@@ -2052,6 +2072,15 @@ lru-cache@^6.0.0:
   integrity sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==
   dependencies:
     yallist "^4.0.0"
+
+md5@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.npmjs.org/md5/-/md5-2.3.0.tgz"
+  integrity sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==
+  dependencies:
+    charenc "0.0.2"
+    crypt "0.0.2"
+    is-buffer "~1.1.6"
 
 merge2@^1.3.0, merge2@^1.4.1:
   version "1.4.1"
@@ -2338,7 +2367,8 @@ queue-microtask@^1.2.2:
   resolved "https://registry.npmjs.org/queue-microtask/-/queue-microtask-1.2.3.tgz"
   integrity sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==
 
-"react-dom@^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0", "react-dom@^16.0.0 || ^17.0.0 || ^18.0.0", react-dom@^18.2.0, react-dom@>=15.0.0, react-dom@>=16, react-dom@>=16.6.0, react-dom@>=16.8, react-dom@>=16.8.0:
+
+react-dom@^18.0.0, react-dom@^18.2.0, react-dom@>=16, react-dom@>=16.2.0, react-dom@>=16.8:
   version "18.2.0"
   resolved "https://registry.npmjs.org/react-dom/-/react-dom-18.2.0.tgz"
   integrity sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==
@@ -2403,6 +2433,7 @@ react-toastify@^9.1.2:
   dependencies:
     clsx "^1.1.1"
 
+
 react-transition-group@^4.4.5:
   version "4.4.5"
   resolved "https://registry.npmjs.org/react-transition-group/-/react-transition-group-4.4.5.tgz"
@@ -2424,6 +2455,14 @@ react-transition-group@2.9.0:
     react-lifecycles-compat "^3.0.4"
 
 "react@^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.0.0 || ^17.0.0 || ^18.0.0", react@^18.0.0, react@^18.2.0, "react@>= 16", react@>=15.0.0, react@>=16, react@>=16.6.0, react@>=16.8, react@>=16.8.0:
+
+react-webcam@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.npmjs.org/react-webcam/-/react-webcam-7.0.1.tgz"
+  integrity sha512-8E/Eb/7ksKwn5QdLn67tOR7+TdP9BZdu6E5/DSt20v8yfW/s0VGBigE6VA7R4278mBuBUowovAB3DkCfVmSPvA==
+
+react@^18.0.0, react@^18.2.0, "react@>= 16", react@>=16, react@>=16.2.0, react@>=16.8, react@>=16.8.0:
+
   version "18.2.0"
   resolved "https://registry.npmjs.org/react/-/react-18.2.0.tgz"
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
@@ -2623,6 +2662,7 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
+
 tabbable@^6.0.1:
   version "6.1.2"
   resolved "https://registry.npmjs.org/tabbable/-/tabbable-6.1.2.tgz"
@@ -2632,6 +2672,17 @@ tailwind-merge@^1.9.1:
   version "1.12.0"
   resolved "https://registry.npmjs.org/tailwind-merge/-/tailwind-merge-1.12.0.tgz"
   integrity sha512-Y17eDp7FtN1+JJ4OY0Bqv9OA41O+MS8c1Iyr3T6JFLnOgLg3EvcyMKZAnQ8AGyvB5Nxm3t9Xb5Mhe139m8QT/g==
+
+sweetalert2-react-content@^5.0.7:
+  version "5.0.7"
+  resolved "https://registry.npmjs.org/sweetalert2-react-content/-/sweetalert2-react-content-5.0.7.tgz"
+  integrity sha512-8Fk82Mpk45lFXpJWKIFF/lq8k/dJKDDQGFcuqVosaL/qRdViyAs5+u37LoTGfnOIvf+rfQB3PAXcp1XLLn+0ew==
+
+sweetalert2@^11.0.0, sweetalert2@^11.7.5:
+  version "11.7.5"
+  resolved "https://registry.npmjs.org/sweetalert2/-/sweetalert2-11.7.5.tgz"
+  integrity sha512-RBPKdK8Uf9/bz9r4vy7x6sGqf0MioSXt1po1lAwwcl3AwbjHVTc5S0yud4ZJKU1EhvJFVDrFoqIpHwWERwZJEA==
+
 
 tailwindcss@^3.3.2:
   version "3.3.2"
